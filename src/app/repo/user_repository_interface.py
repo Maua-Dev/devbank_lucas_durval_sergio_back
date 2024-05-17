@@ -17,13 +17,6 @@ class IUserRepository(ABC):
         pass
     
     @abstractmethod
-    def create_user(self, user: User) -> User:
-        '''
-        Creates a new User in the database
-        '''
-        pass
-    
-    @abstractmethod
     def delete_User(self, name: str) -> User:
         '''
         Deletes the User with the given name.

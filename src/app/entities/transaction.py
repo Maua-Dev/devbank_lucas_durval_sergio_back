@@ -9,28 +9,28 @@ class Transaction:
     timestamp : float
     
     def __init__(self, type: TransactionTypeEnum=None, value: float=None, current_balance: float=None, timestamp: float=None):
-        validation_type = self.validate_type(type)
+        validation_type = self.validation_type(type)
         if validation_type[0] is False:
             raise ParamNotValidated("type", validation_type[1])
         self.type = type
-        validation_value = self.validate_value(value)
+        validation_value = self.validation_value(value)
         if validation_value[0] is False:
             raise ParamNotValidated("value", validation_value[1])
         self.value = value
-        validation_current_balance = self.validate_current_balance(current_balance)
+        validation_current_balance = self.validation_current_balance(current_balance)
         if validation_current_balance[0] is False:
             raise ParamNotValidated("current_balance", validation_current_balance[1])
         self.current_balance = current_balance
-        validation_timestamp = self.validate_timestamp(timestamp)
+        validation_timestamp = self.validation_timestamp(timestamp)
         if validation_timestamp[0] is False:
             raise ParamNotValidated("timestamp", validation_timestamp[1])
         self.timestamp = timestamp
 
     @staticmethod   
-    def validation_type(type: TransactionTypeEnum) -> Tuple[bool, str]:
-        if type is None:
+    def validation_type(type_transaction: TransactionTypeEnum) -> Tuple[bool, str]:
+        if type_transaction is None:
             return (False, "Type is required")
-        if type(type) != TransactionTypeEnum:
+        if type(type_transaction) != TransactionTypeEnum:
             return (False, "Type must be TransactionTypeEnum")
         return (True, "")
     
@@ -66,7 +66,7 @@ class Transaction:
     
     def to_dict(self):
         return {
-            "type": self.type,
+            "type": self.type.value,
             "value": self.value,
             "current_balance": self.current_balance,
             "timestamp": self.timestamp

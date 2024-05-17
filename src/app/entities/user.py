@@ -7,8 +7,9 @@ class User:
     account: str
     agency: str
     current_balance: float
+    user_id: int
     
-    def __init__(self, name: str=None, account: str=None, agency: str=None, current_balance: float=None):
+    def __init__(self, name: str=None, account: str=None, agency: str=None, current_balance: float=None, user_id: int=None):
         validation_name = self.validate_name(name)
         if validation_name[0] is False:
             raise ParamNotValidated("name", validation_name[1])
@@ -78,7 +79,7 @@ class User:
         }
     
     def __eq__(self,other):
-        return self.name == other.name and self.account == other.account and self.agency == other.agency and self.current_balance == other.current_balance
+        return self.user_id == other.user_id and self.name == other.name and self.account == other.account and self.agency == other.agency and self.current_balance == other.current_balance 
     
     def __repr__(self):
         return f"User(name={self.name}, account={self.account}, agency={self.agency}, current_balance={self.current_balance})"
