@@ -15,10 +15,15 @@ from .entities.user import User
 
 from .entities.transaction import Transaction
 
+import time
+
+from src.app.enums import transaction_type_enum
+
 
 app = FastAPI()
 
-repo = Environments.get_user_repo()()
+repo_user = Environments.get_user_repo()()
+repo_transaction = Environments.get_transaction_repo()()
 
 # @app.get("/items/get_all_items")
 # def get_all_items():
@@ -26,7 +31,6 @@ repo = Environments.get_user_repo()()
 #     return {
 #         "items": [item.to_dict() for item in items]
 #     }
-
 
 
 # @app.post("/items/create_item", status_code=201)
@@ -124,10 +128,10 @@ repo = Environments.get_user_repo()()
 #         "item": item_updated.to_dict()    
 #     }
 
-@app.get("/user")
+@app.get("/")
 def get_user(user_id: int):
     
-    user = repo.get_user(user_id)
+    user = repo_user.get_user(user_id)
     
     if user is None:
         raise HTTPException(status_code=404, detail="User Not found")
@@ -153,11 +157,45 @@ def create_deposit(request: dict):
 
     total_depositado = dois*2 + cinco*5 + dez*10 + vinte*20 + cinquenta*50 + cem*100 + duzentos*200
 
-    if total_depositado > User.current_balance:
+    if total_depositado > user.current_balance:
         raise HTTPException(status_code=403, detail="Depósito suspeito")
     
-    user = get_user("Vitor Soller")
+    user = get_user(1)
 
-    transaction = Transaction("DEPOSIT", total_depositado, )
+    timestamp = int(time.time() * 1000)
+    transaction = Transaction(TransactionTypeEnum.DEPOSIT, total_depositado, user.current_balance, timestamp)
+
+    user.current_balance += total_depositado
+
+@app.post("/withdraw")
+def create_withdraw(request: dict):
+    
+    # dicionário com os valores
+    dois = request.get("2")
+    cinco = request.get("5")
+    dez = request.get("10")
+    vinte = request.get("20")
+    cinquenta = request.get("50")
+    cem = request.get("100")
+    duzentos = request.get("200")
+    
+    total_depositado = dois*2 + cinco*5 + dez*10 + vinte*20 + cinquenta*50 + cem*100 + duzentos*200
+
+    user = get_user(1)
+
+    if user.current_balance < total_depositado:
+        raise HTTPException(status_code=403, detail="Saldo insuficiente")
+
+    transaction = Transaction(TransactionTypeEnum.WITHDRAW, request.get("value"))
+
+    user.current_balance -= total_depositado
+
+@app.get("/history")
+def get_all_transactions():
+    
+    transactions = repo_transaction.get_transaction_repo()
+    return {
+        "all_transactions": [transactions.to_dict() for transaction in transactions]
+    }
 
 handler = Mangum(app, lifespan="off")
