@@ -2,10 +2,10 @@ from typing import Dict, Optional, List
 
 from ..enums.transaction_type_enum import TransactionTypeEnum
 from ..entities.user import User
-from .user_repository_interface import UserRepository
+from .user_repository_interface import IUserRepository
 
 
-class UserRepositoryMock(UserRepository):
+class UserRepositoryMock(IUserRepository):
     users: Dict[int, User]
     
     # creates the users list
@@ -15,8 +15,7 @@ class UserRepositoryMock(UserRepository):
         }
     
     # creates a new user
-    def create_user(self, user_id: int=None, name: str=None, agency:str=None, account:str=None, current_balance: float=None):
-        user = User(name=name, agency=agency, account=account, current_balance=current_balance)
+    def create_user(self, user: User, user_id: int):
         self.users[user_id] = user
 
     # gets a user in the users list
@@ -31,6 +30,8 @@ class UserRepositoryMock(UserRepository):
     def update_user(self, user_id: int=None, name:str=None, agency:str=None, account:str=None, current_balance: float=None) -> User:
         user = self.users.get(user_id)
         if user:
+            if name is not None:
+                user.name = name
             if agency is not None:
                 user.agency = agency
             if account is not None:

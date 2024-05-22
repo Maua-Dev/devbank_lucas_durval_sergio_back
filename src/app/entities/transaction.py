@@ -42,7 +42,7 @@ class Transaction:
             return (False, "Value must be a float")
         if value < 0:
             return (False,"Value must be positive")
-        return (value)
+        return (True, "")
         
 
     @staticmethod   
@@ -60,7 +60,7 @@ class Transaction:
         if timestamp is None:
             return (False, "Timestamp is required")
         if type(timestamp) != float:
-            return (False, "Value must be a float")
+            return (False, "Timestamp must be a float")
         return (True, "")
     
     
