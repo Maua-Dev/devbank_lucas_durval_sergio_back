@@ -1,26 +1,28 @@
-# from fastapi.exceptions import HTTPException
-# import pytest
-# from src.app.entities.item import Item
-# from src.app.enums.item_type_enum import ItemTypeEnum
-# from src.app.main import get_all_items, get_item, create_item, delete_item, update_item
-# from src.app.repo.item_repository_mock import ItemRepositoryMock
+from urllib import response
+from fastapi.exceptions import HTTPException
+import pytest
+from src.app import repo
+from src.app.entities.user import User
+from src.app.entities.transaction import Transaction
+from src.app.enums.transaction_type_enum import TransactionTypeEnum
+from src.app.main import get_user, create_deposit, create_withdraw, get_all_transactions
+from src.app.repo.user_repository_mock import UserRepositoryMock
+from src.app.repo.transaction_repository_mock import TransactionRepositoryMock
 
-# class Test_Main:
-#     def test_get_all_items(self):
-#         repo = ItemRepositoryMock()
-#         response = get_all_items()
-#         assert all([item_expect.to_dict() == item for item_expect, item in zip(repo.items.values(), response.get("items"))]) 
+class Test_Main:
+    # def test_get_all_items(self):
+    #     repo = ItemRepositoryMock()
+    #     response = get_all_items()
+    #     assert all([item_expect.to_dict() == item for item_expect, item in zip(repo.items.values(), response.get("items"))]) 
         
-#     def test_get_item(self):
-#         repo = ItemRepositoryMock()
-#         item_id = 1
-#         response = get_item(item_id=item_id)
-#         assert response == {
-#             'item_id' : item_id,
-#             'item': repo.items.get(item_id).to_dict()
-#         }
+    def test_get_user(self):
+        repo = UserRepositoryMock()
+        response = get_user()
+        assert response == {
+            'user': repo.users[0].to_dict()
+        }
         
-#     def test_get_item_id_is_none(self):
+#     def test_get_user_id_is_none(self):
         
 #         item_id = None
 #         with pytest.raises(HTTPException) as err:
@@ -36,19 +38,55 @@
 #         with pytest.raises(HTTPException) as err:
 #             get_item(item_id=item_id)
             
-#     def test_create_item(self):
-#         repo = ItemRepositoryMock()
+    def test_create_deposit(self):
+        repo = TransactionRepositoryMock()
         
-#         body = {
-#             'item_id': 0,
-#             'name': 'test',
-#             'price': 1.0,
-#             'item_type': 'TOY',
-#             'admin_permission': False
-#         }
-#         response = create_item(request=body)
-#         assert response == {'item_id': 0,'item': {'admin_permission': False, 'item_type': 'TOY', 'name': 'test', 'price': 1.0}}
-    
+        body = {
+            "2": 1,
+            "5": 1,
+            "10": 1,
+            "20": 1,
+            "50": 1,
+            "100": 1,
+            "200": 1
+        }
+        response = create_deposit(request=body)
+        print(response)
+        assert response == {'transaction': {'type': 'DEPOSIT', 'value': 387.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
+
+    def test_create_deposit_suspect(self):
+        repo = TransactionRepositoryMock()
+
+        body = {
+            "2": 1,
+            "5": 1,
+            "10": 1,
+            "20": 1,
+            "50": 1,
+            "100": 1,
+            "200": 100
+        }
+        response = create_deposit(request=body)
+        with pytest.raises(HTTPException) as err:
+            assert response == {'transaction': {'type': 'DEPOSIT', 'value': 387.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
+
+
+    def test_create_withdraw(self):
+        repo = TransactionRepositoryMock()
+        
+        body = {
+            "2": 1,
+            "5": 1,
+            "10": 1,
+            "20": 1,
+            "50": 1,
+            "100": 1,
+            "200": 1
+        }
+        response = create_withdraw(request=body)
+        print(response)
+        assert response == {'withdraw': {'type': 'WITHDRAW', 'value': 387.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
+ 
 #     def test_create_item_conflict(self):
 #         repo = ItemRepositoryMock()
         
