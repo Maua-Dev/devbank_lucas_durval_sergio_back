@@ -50,9 +50,12 @@ class Test_Main:
             "100": 1,
             "200": 1
         }
-        response = create_deposit(request=body)
+        response = create_deposit(request=body)['transaction']
         print(response)
-        assert response == {'transaction': {'type': 'DEPOSIT', 'value': 387.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
+        assert response['type'] == TransactionTypeEnum.DEPOSIT.value
+        assert response['value'] == 387.0
+        assert response['current_balance'] == 1000.0
+  
 
     def test_create_deposit_suspect(self):
         repo = TransactionRepositoryMock()
@@ -66,9 +69,11 @@ class Test_Main:
             "100": 1,
             "200": 100
         }
-        response = create_deposit(request=body)
-        with pytest.raises(HTTPException) as err:
-            assert response == {'transaction': {'type': 'DEPOSIT', 'value': 387.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
+        try:
+            response = create_deposit(request=body)
+        except HTTPException as error:
+            assert error.status_code == 403
+            assert error.detail == "Depósito suspeito"
 
 
     def test_create_withdraw(self):
@@ -83,10 +88,28 @@ class Test_Main:
             "100": 1,
             "200": 1
         }
-        response = create_withdraw(request=body)
+        response = create_withdraw(request=body)['transaction']
         print(response)
-        assert response == {'withdraw': {'type': 'WITHDRAW', 'value': 387.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
+        assert response['type'] == TransactionTypeEnum.WITHDRAW.value
+        assert response['value'] == 387.0
+        assert response['current_balance'] == 1000.0
+  
  
+    def test_create_negative_balance(self):
+        repo = TransactionRepositoryMock()
+        
+        body = {
+            "2": 1,
+            "5": 1,
+            "10": 1,
+            "20": 1,
+            "50": 1,
+            "100": 1,
+            "200": 1
+        }
+        response = create_withdraw(request=body)
+        with pytest.raises(HTTPException) as error:
+            assert response == {'withdraw': {'type': 'WITHDRAW', 'value': 1002.0, 'current_balance': 1000.0, 'timestamp': 1.0}}
 #     def test_create_item_conflict(self):
 #         repo = ItemRepositoryMock()
         

@@ -77,16 +77,19 @@ def create_withdraw(request: dict):
     cem = request.get("100")
     duzentos = request.get("200")
     
-    total_depositado = dois*2 + cinco*5 + dez*10 + vinte*20 + cinquenta*50 + cem*100 + duzentos*200
+    total_sacado= dois*2 + cinco*5 + dez*10 + vinte*20 + cinquenta*50 + cem*100 + duzentos*200
 
     user = get_user()
 
-    if user[0] < total_depositado:
+    if user[0] < total_sacado:
         raise HTTPException(status_code=403, detail="Saldo insuficiente")
 
-    transaction = Transaction(TransactionTypeEnum.WITHDRAW, request.get("value"))
+    transaction = Transaction(TransactionTypeEnum.WITHDRAW, float(total_sacado), user.current_balance, float(timestamp))
 
-    user.current_balance -= total_depositado
+    user.current_balance -= total_sacado
+    return {
+        "transaction": transaction.to_dict()
+    }
 
 @app.get("/history")
 def get_all_transactions():
